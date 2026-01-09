@@ -26,8 +26,19 @@ public class MemberServiceImpl implements MemberService{
 	//           -- commit
 	public void memberInsert(MemberVO vo) {
 		// TODO Auto-generated method stub
-		mapper.memberInsert(vo);
-		mapper.memberAuthorityInsert(vo.getUserid());
+		mapper.memberInsert(vo);		
+	}
+
+	@Override
+	public void memberAuthorityInsert(String userid) {
+		// TODO Auto-generated method stub
+		mapper.memberAuthorityInsert(userid);
+	}
+
+	@Override
+	public MemberVO memberInfoData(String userid) {
+		// TODO Auto-generated method stub
+		return mapper.memberInfodData(userid);
 	}
 
 }

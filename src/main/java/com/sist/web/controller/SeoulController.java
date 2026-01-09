@@ -91,7 +91,9 @@ public class SeoulController {
 		}else if(contenttype == 14) {
 			jsp = "../seoul/culture.jsp";
 		}else if(contenttype == 15) {
-			jsp = "../seoul/fastival.jsp";
+			SeoulVO vo = sService.seoulFestivalDetailData(contentid);
+			model.addAttribute("vo", vo);
+			jsp = "../seoul/festival.jsp";
 		}else if(contenttype == 32) {
 			jsp = "../seoul/stey.jsp";
 		}else if(contenttype == 38) {

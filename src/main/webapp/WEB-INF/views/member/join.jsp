@@ -50,14 +50,15 @@
 			      <span class="glyphicon glyphicon-leaf"></span>
 			    </div>
 			    <div class="panel-body">
-			     <form id="frm" name="frm" method="post" action="/member/join_ok">
+			     <form id="frm" ref="frm" method="post" action="/member/join_ok">
 			      <table class="table table-bordered table-hover">
 			        <tr>
 			          <th class="text-center" width="20%">ID</th>
 			          <td>
 			            <div class="form-inline">
-			              <input type="text" name="userid" ref="id" class="form-control input-sm" placeholder="아이디" v-model=id>
-			              <button type="button" class="btn btn-mint btn-sm">중복체크</button>
+			              <input type="text" name="userid" ref="userid" class="form-control input-sm" placeholder="아이디" v-model=userid v-bind:readonly="isReadOnly">
+			              <button type="button" class="btn btn-mint btn-sm" @click="idCheck()">중복체크</button>
+			              <span style="color: red">{{idOk}}</span>
 			            </div>
 			          </td>
 			        </tr>			
@@ -65,14 +66,14 @@
 			          <th class="text-center">Password</th>
 			          <td>
 			            <div class="form-inline">
-			              <input type="password" v-model="pwd" name="userpwd" ref="pwd1" class="form-control input-sm" placeholder="비밀번호">
-			              <input type="password" v-model="pwd1" name="pwd1" ref="pwd2" class="form-control input-sm" placeholder="비밀번호 재입력">
+			              <input type="password" v-model="userpwd" name="userpwd" ref="userpwd" class="form-control input-sm" placeholder="비밀번호">
+			              <input type="password" v-model="userpwd1" name="userpwd1" ref="userpwd1" class="form-control input-sm" placeholder="비밀번호 재입력">
 			            </div>
 			          </td>
 			        </tr>			
 			        <tr>
 			          <th class="text-center">이름</th>
-			          <td><input type="text" name="username" ref="name" v-model="name" class="form-control input-sm" placeholder="이름 입력"></td>
+			          <td><input type="text" name="username" ref="username" v-model="username" class="form-control input-sm" placeholder="이름 입력"></td>
 			        </tr>			
 			        <tr>
 			          <th class="text-center">성별</th>
@@ -93,7 +94,7 @@
 			          <th class="text-center">우편번호</th>
 			          <td>
 			            <div class="form-inline">
-			              <input type="text" ref="post" name="post" class="form-control input-sm" v-mpdel="post" readonly>
+			              <input type="text" ref="post" name="post" class="form-control input-sm" v-model="post" readonly>
 			              <button type="button" @click="postFind()" class="btn btn-pink btn-sm">우편번호검색</button>
 			            </div>
 			          </td>
@@ -125,7 +126,7 @@
 			        </tr>			
 			        <tr>
 			          <td colspan="2" class="text-center">
-			            <button type="button" class="btn btn-mint btn-sm" id="joinBtn">회원가입</button>
+			            <button type="button" class="btn btn-mint btn-sm" @click="join()">회원가입</button>
 			            <button type="button" class="btn btn-pink btn-sm" onclick="history.back()">취소</button>
 			          </td>
 			        </tr>
@@ -139,12 +140,48 @@
   	let joinApp = Vue.createApp({
   		data() {
   			return {
+  				userid : '',
+  				isReadOnly : false,
+  				idOk : '',
+  				username : '',
+  				userpwd : '',
+  				userpwd1 : '',
+  				sex : '',
+  				birthday : '',
+  				email : '',
   				post : '',
-  				addr1 : ''
+  				addr1 : '',
+  				addr2 : '',
+  				phone1 : '',
+  				phone2 : '',
+  				content : ''
   			}
   		},
   		methods : {
   			// idcheck
+  			idCheck() {
+  				if(this.userid === '') {
+  					this.$refs.userid.focus()
+  					return
+  				}
+  				axios.get("/member/idcheck_vue/", {
+  					params : {
+  						userid : this.userid
+  					}
+  				}).then(response => {
+  					console.log(response.data)
+  					if(response.data === 0) {
+  						this.idOk = '사용 가능한 아이디입니다.'
+  						this.isReadOnly = true
+  					}else {
+  						this.idOk = '이미 사용 중인 아이디입니다.'
+  						this.userid = ''
+  						this.$refs.userid.focus()
+  					}
+  				}).catch(error => {
+  					consol.log(error.response)
+  				})
+  			},
   			postFind() {
   				let _this = this
   				new daum.Postcode({
@@ -153,8 +190,38 @@
   						_this.addr1 = data.address
   					}
   				}).open()
-  			}
-  			// join
+  			},
+  		  // join
+  			join() {
+  				if(this.userid === '') {
+  					this.$refs.userid.focus()
+  					return
+  				}
+  				if(this.userpwd === '') {
+  					this.$refs.userpwd.focus()
+  					return
+  				}
+  				if(this.userpwd1 === '') {
+  					this.$refs.userpwd1.focus()
+  					return
+  				}
+  				if(this.userpwd !== this.userpwd1) {
+  					this.userpwd = ''
+  					this.userpwd1 = ''
+  					this.$refs.userpwd.focus()
+  					return
+  				}
+  				if(this.username === '') {
+  					this.$refs.username.focus()
+  					return
+  				}
+  				if(this.birthday === '') {
+  					this.$refs.birthday.focus()
+  					return
+  				}
+  				
+  				this.$refs.frm.submit()
+  			}  			
   		}
   	})
   	joinApp.mount("#join_section")
