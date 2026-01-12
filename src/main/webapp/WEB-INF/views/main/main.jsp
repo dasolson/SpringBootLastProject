@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="description" content="">
@@ -20,12 +21,14 @@
 
     <!-- Responsive CSS -->
     <link href="/css/responsive/responsive.css" rel="stylesheet">
+    <link rel="stylesheet"
+ href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.js"></script>
     <script src="https://unpkg.com/vue-demi"></script>
     <script src="https://unpkg.com/pinia@2.1.7/dist/pinia.iife.prod.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-
 </head>
+
 <body>
     <!-- Preloader Start -->
     <div id="preloader">
@@ -41,9 +44,9 @@
     </div>
 
     <jsp:include page="header.jsp"></jsp:include>
-		<jsp:include page="${main_jsp }"></jsp:include>
+    <jsp:include page="${main_jsp }"></jsp:include>
     <jsp:include page="footer.jsp"></jsp:include>
-
+    
     <!-- Jquery-2.2.4 js -->
     <script src="/js/jquery/jquery-2.2.4.min.js"></script>
     <!-- Popper js -->
@@ -55,4 +58,3 @@
     <!-- Active JS -->
     <script src="/js/active.js"></script>
 </body>
-    

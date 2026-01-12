@@ -1,0 +1,20 @@
+package com.sist.web.service;
+import java.util.*;
+
+import org.apache.ibatis.annotations.Select;
+
+import com.sist.web.vo.BoardReplyVO;
+public interface BoardReplyService {
+	/*@Select("SELECT no, bno, id, name, sex, msg, TO_CHAR(regdate,'yyyy-MM-dd hh24:mi:ss') as dbday "
+			+ "FROM board_reply_3 "
+			+ "WHERE bno = #{bno}")*/
+	public List<BoardReplyVO> boardReplyListData(int bno);
+	
+	/*@Select("SELECT COUNT(*) FROM board_reply_3 "
+			+ "WHERE bno = #{bno}")*/
+	public int boardReplyCount(int bno);
+	
+	public void boardReplyInsert(BoardReplyVO vo);
+	
+	public void boardReplyDelete(int no);
+}
