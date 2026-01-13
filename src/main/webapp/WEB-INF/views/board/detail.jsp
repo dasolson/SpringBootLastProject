@@ -10,6 +10,10 @@
 	cursor: pointer;
 }
 </style>
+<script>
+		const SESSION_ID = '${sessionScope.userid}'
+		const BNO = '${param.no}'
+</script>
 </head>
 <body>
 	<div class="breadcumb-area" style="background-image: url(/img/bg-img/breadcumb.jpg);">
@@ -78,10 +82,10 @@
           	<!-- Comment Area Start -->
           	<div id="comment">
 	            <div class="comment_area section_padding_50 clearfix">
-	                <h4 class="mb-30">댓글 ({{count}})</h4>
+	                <h4 class="mb-30">댓글 ({{store.count}})</h4>
 	                <ol>
 	                    <!-- Single Comment Area -->
-	                    <li class="single_comment_area" v-for="(rvo, index) in list" :key="index">
+	                    <li class="single_comment_area" v-for="(rvo, index) in store.list" :key="index">
 	                        <div class="comment-wrapper d-flex">
 	                            <!-- Comment Meta -->
 	                            <div class="comment-author">
@@ -93,79 +97,124 @@
 	                                <span class="comment-date text-muted">{{rvo.dbday}}</span>
 	                                <h5>{{rvo.name}}</h5>
 	                                <p>{{rvo.msg}}</p>
-	                                <a class="a-btn" v-if="sessionId===rvo.id">수정</a>
-	                                <a class="active a-btn" v-if="sessionId===rvo.id" @click="replyDelete(rvo.no)">삭제</a>
-	                            </div>
-	                        </div>                        
+	                                <a class="a-btn" v-if="store.sessionId===rvo.id" @click="store.toggleUpdate(rvo.no, rvo.msg)">{{store.upReplyNo===rvo.no?'취소':'수정'}}</a>
+	                                <a class="active a-btn" v-if="store.sessionId===rvo.id" @click="store.replyDelete(rvo.no)">삭제</a>
+	                                <div class="comment-form" style="padding-top: 5px" v-if="store.upReplyNo===rvo.no"> 
+		                                <form action="#" method="post" >
+								                        <textarea v-model="store.updateMsg[rvo.no]" cols="50" rows="5" placeholder="Message" style="float: left;display: inline-block"></textarea>
+								                        <button type="button" class="btn-primary" style="float: left;width: 80px;height: 100px;display: inline-block" @click="store.replyUpdate(rvo.no)">댓글수정</button>                        
+								                    </form>
+							                    </div>
+	                            </div>	                            
+	                        </div>  	                         	                                          
 	                    </li>	                    
 	                </ol>
 	            </div>
 	
 	            <!-- Leave A Comment -->
-	            <div class="leave-comment-area section_padding_50 clearfix" v-if="sessionId!==''">
+	            <div class="leave-comment-area section_padding_50 clearfix" v-if="store.sessionId!==''">
 	                <div class="comment-form">                   
 	                    <form action="#" method="post" >
-                           <textarea ref="msg" v-model="msg" cols="95" rows="5" placeholder="Message" style="float: left;display: inline-block"></textarea>
-                           <button type="button" class="btn-primary" style="float: left;width: 80px;height: 100px;display: inline-block" @click="replyWrite()">댓글쓰기</button>                        
+                          <textarea ref="msg" v-model="store.msg" cols="95" rows="5" placeholder="Message" style="float: left;display: inline-block"></textarea>
+                          <button type="button" class="btn-primary" style="float: left;width: 80px;height: 100px;display: inline-block" @click="store.replyInsert(msgRef)">댓글쓰기</button>                        
 	                    </form>
 	                </div>
 	            </div>
             </div>
+            <script src="/vue/axios.js"></script>
+            <script src="/vue/reply/boardReplyStore.js"></script>
             <script>
-            	const commentApp = Vue.createApp({
-            		data() {
-            			return {
-            				list : [],
-            				count : 0,
-            				bno : '${vo.no}',
-            				sessionId : '${sessionScope.userid}',
-            				msg : ''
-            			}
-            		},
-            		mounted() {
-            			this.dataRecv()
-            		},
-            		methods : {
-            			dataRecv() {
-            				axios.get('/reply/list_vue/', {
-            					params : {
-            						bno : this.bno	
-            					}
-            					
-            				}).then(response => {
-            					console.log(response.data)
-            					this.list = response.data.list
-            					this.count = response.data.count
-            				})
-            			},
-            			replyWrite() {
-            				if(this.msg === '') {
-            					this.$refs.msg.focus()
-            					return
+            		const {createApp, onMounted, ref} = Vue
+            		const {createPinia} = Pinia
+            		const commentApp = createApp({
+            				setup() {
+            						const store = useBoardReplyStore()
+            						const msgRef = ref(null)
+            						onMounted(() => {
+            								store.sessionId = SESSION_ID
+            								store.replyListData(BNO)
+            						}) // useEffect(() => {})
+            						return {
+            								store,
+            								msgRef
+            						}
             				}
-            				axios.post('/reply/insert_vue/', {
-            					bno : this.bno,
-            					msg : this.msg 
-            				}).then(response => {
-            					console.log(response.data)
-            					this.list = response.data.list
-            					this.count = response.data.count
-            					this.msg = ''
-	            			})
-	            		},
-	            		replyDelete(no) {
-		            			axios.post('/reply/delete_vue/', {
-		        					bno : this.bno,
-		        					no : no
-		        				}).then(response => {
-		        					console.log(response.data)
-		        					this.list = response.data.list
-		        					this.count = response.data.count        					
-		            		})
-	            		}
-            		}
-            	})
-            	commentApp.mount("#comment")
+            		})
+            		commentApp.use(createPinia())
+            		commentApp.mount("#comment")
+            /* const commentApp = Vue.createApp({
+         	   data() {
+         		   return {
+         			   list : [],
+         			   count : 0,
+         			   bno : '${vo.no}',
+         			   sessionId : '${sessionScope.userid}',
+         			   msg : '',
+         			   upReplyNo : null,
+         			   updateMsg : {}
+         		   }
+         	   },
+         	   mounted() {
+         		   this.dataRecv()
+         	   },
+         	   methods : {
+         		   dataRecv() {
+         			 axios.get('/reply/list_vue/', {
+         				 params : {
+         					 bno : this.bno
+         				 }
+         				 
+         			 }).then(response => {
+         				 console.log(response.data)
+         				 this.list = response.data.list
+         				 this.count = response.data.count
+         			 })  
+         		   },
+         		   replyWrite() {
+         			   if(this.msg === '')
+         			   {
+         				   this.$refs.msg.focus()
+         				   return
+         			   }
+         			   axios.post('/reply/insert_vue/', {
+         				   bno : this.bno,
+         				   msg : this.msg
+         			   }).then(response => {
+         				 console.log(response.data)
+         				 this.list = response.data.list
+         				 this.count = response.data.count
+         				 this.msg = ''
+         			 })  
+         		   },
+         		   replyDelete(no) {
+         			   axios.delete('/reply/delete_vue/', {
+         				 params : {
+         					 bno : this.bno,
+         				   no : no
+         				 }         				   
+         			   }).then(response => {
+         				 console.log(response.data)
+         				 this.list = response.data.list
+         				 this.count = response.data.count         				 
+         			 })  
+         		   },
+         		   toggleUpdate(no, msg) {
+         			   this.upReplyNo = this.upReplyNo === no?null : no
+         			   this.updateMsg[no] = msg
+         		   },
+         		   replyUpdate(no) {
+         			   axios.put("/reply/update_vue/", {
+         				   no : no,
+         				   bno : this.bno,
+         				   msg : this.updateMsg[no]
+         			   }).then(response => {
+         				   this.list = response.data.list         				   
+         				   this.upReplyNo = null
+         			   })
+         		   }
+         	   }
+            })
+            commentApp.mount("#comment") */
             </script>
           </div>
       </div>

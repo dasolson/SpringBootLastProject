@@ -111,15 +111,20 @@ public class BoardController {
 	}
 	
 	@PostMapping("/board/delete_ok")
-	@ResponseBody // 생략 가능
-	public String board_delete_ok(@RequestParam("no") int no, @RequestParam("pwd") String pwd) {
-		String res = "";
-		boolean b = bService.boardDelete(no, pwd);
-		if(b == true) {
-			res = "<script>" + "location.href=\"/board/list\"" + "</script>"; 
-		}else {
-			res = "<script>" + "alert(\"비밀번호가 다릅니다.\");" + "history.back();" + "</script>";
-		}
-		return res;
-	}
+	  @ResponseBody // 생략이 가능 
+	  public String board_delete_ok(@RequestParam("no") int no, @RequestParam("pwd") String pwd) {
+		  String res="";
+		  boolean b = bService.boardDelete(no,pwd);
+		  if(b == true) {
+			  res="<script>"
+				 +"location.href=\"/board/list\""
+				 +"</script>";
+		  }else {
+			  res="<script>"
+				 +"alert(\"비밀번호가 틀립니다!!\");"
+				 +"history.back();"
+				 +"</script>";
+		  }
+		  return res;
+	  }
 }
