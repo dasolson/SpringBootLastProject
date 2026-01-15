@@ -191,24 +191,16 @@
                           <div class="col-12">
                            <div class="pagination-area d-sm-flex mt-15">
                              <nav aria-label="#">
-                             <ul class="pagination">
-                               
+                             <ul class="pagination">                               
                                 <li class="page-item" v-if="store.startPage>1">
                                     <a class="page-link" @click="store.movePage(store.startPage-1)">이전 <i class="fa fa-angle-double-left" aria-hidden="true"></i></a>
                                 </li>
-                               
-                               
-                               
                                 <li v-for="i in store.range" :class="i===store.curpage?'page-item active':'page-item'">
                                     <a class="page-link" @click="store.movePage(i)">{{i}}</a>
-                                </li>
-                               
-                                
-                               
+                                </li>  
                                 <li class="page-item" v-if="store.endPage<store.totalpage">
                                     <a class="page-link" @click="store.movePage(store.endPage+1)">다음 <i class="fa fa-angle-double-right" aria-hidden="true"></i></a>
-                                </li>
-                               
+                                </li>                               
                             </ul>
                           </nav>
                         <div class="page-status">
